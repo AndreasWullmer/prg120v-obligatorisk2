@@ -1,21 +1,14 @@
 <?php
-require 'db.php';
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-// prøv en enkel spørring: hent tabellnavn
-$tables = $pdo->query("SHOW TABLES")->fetchAll();
+require 'db.php'; // denne skal opprette $pdo
 
-echo "<h1>DB-test</h1>";
-echo "<p>Kobling OK ✅</p>";
-
-if (!$tables) {
-    echo "<p>Fant ingen tabeller.</p>";
-} else {
-    echo "<p>Tabeller i databasen:</p><ul>";
-    foreach ($tables as $row) {
-        // raden har nøkkel 0 med tabellnavn
-        echo "<li>" . htmlspecialchars($row[array_key_first($row)]) . "</li>";
-    }
-    echo "</ul>";
+try {
+    // Enkel sjekk: koble og spør MySQL-versjon
+    $stmt = $pdo->query('SELECT VERSION() AS v');
+    $row = $stmt->fetch();
+    echo "DB-tilkobling OK. MySQL-versjon: " . ($row['v'] ?? 'ukjent');
+} catch (Throwable $e) {
+    echo "FEIL: " . $e->getMessage();
 }
-
-echo '<p><a href="index.php">Til start</a></p>';

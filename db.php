@@ -1,20 +1,19 @@
 <?php
-// db.php – enkel databasekobling med PDO (XAMPP-standard: root uten passord)
+die("TEST-MARKØR");
+// --- Verdier fra Dokploy ---
+$host = 'mysql-12.dokploy.usn.no';
+$port = 3306;
+$db   = 'anwul4724';
+$user = 'anwul4724';
+$pass = '4430anwul4724';
 
-$DB_HOST = 'localhost';
-$DB_NAME = 'prg120v';   // databasen du laget i phpMyAdmin
-$DB_USER = 'root';      // XAMPP default
-$DB_PASS = '';          // tomt passord som standard i XAMPP
-$DSN     = "mysql:host=$DB_HOST;dbname=$DB_NAME;charset=utf8mb4";
+// --- Koble til med mysqli ---
+$mysqli = new mysqli($host, $user, $pass, $db, $port);
 
-$options = [
-    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION, // få tydelig feilmelding ved feil
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    PDO::ATTR_EMULATE_PREPARES   => false,
-];
-
-try {
-    $pdo = new PDO($DSN, $DB_USER, $DB_PASS, $options);
-} catch (PDOException $e) {
-    exit('Database-tilkobling feilet: ' . htmlspecialchars($e->getMessage()));
+// Sjekk om det oppstår feil ved tilkobling
+if ($mysqli->connect_errno) {
+    die("DB-tilkobling feilet: (" . $mysqli->connect_errno . ") " . $mysqli->connect_error);
 }
+
+// Sørg for riktig tegnsett (æøå osv.)
+$mysqli->set_charset("utf8mb4");
