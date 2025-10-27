@@ -1,60 +1,42 @@
 <?php
-require 'db.php';
+require 'storage.php';
 
-$melding = '';
-
-// hent studenter til listeboksen
-$studenter = $pdo->query("SELECT brukernavn, fornavn, etternavn FROM student ORDER BY brukernavn")->fetchAll();
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $brukernavn = $_POST['brukernavn'] ?? '';
-    if ($brukernavn === '') {
-        $melding = 'Velg en student.';
-    } else {
-        $stmt = $pdo->prepare("DELETE FROM student WHERE brukernavn = :bn");
-        $stmt->execute([':bn' => $brukernavn]);
-        $melding = $stmt->rowCount() > 0
-            ? "Student '$brukernavn' er slettet."
-            : "Fant ingen student med brukernavn '$brukernavn'.";
-        // oppdater lista etter sletting
-        $studenter = $pdo->query("SELECT brukernavn, fornavn, etternavn FROM student ORDER BY brukernavn")->fetchAll();
-    }
+// Hvis du klikker en "Slett"-lenke med ?id=...
+if (isset($_GET['id'])) {
+    $id = (int)$_GET['id'];
+    student_delete($id);
+    $msg = "Student med ID $id er slettet.";
 }
+
+// Hent alle studenter for å vise liste med slett-lenker
+$studenter = student_all();
+$klasser = [];
+foreach (klasse_all() as $k) { $klasser[$k['id']] = $k['navn']; }
 ?>
 <!doctype html>
 <html lang="no">
-<head>
-  <meta charset="utf-8"><title>Slett student</title>
-  <script>
-    function bekreftSletting() {
-      return confirm('Er du sikker på at du vil slette denne studenten?');
-    }
-  </script>
-</head>
+<head><meta charset="utf-8"><title>Slett student</title></head>
 <body>
   <h1>Slett student</h1>
-  <p><a href="index.php">Til meny</a></p>
 
-  <?php if ($melding): ?>
-    <p><strong><?php echo htmlspecialchars($melding); ?></strong></p>
+  <?php if (!empty($msg)): ?>
+    <p><?= htmlspecialchars($msg) ?></p>
   <?php endif; ?>
 
   <?php if (!$studenter): ?>
     <p>Ingen studenter å slette.</p>
   <?php else: ?>
-    <form method="post" onsubmit="return bekreftSletting();">
-      <label>Velg student (brukernavn):
-        <select name="brukernavn" required>
-          <option value="">-- velg --</option>
-          <?php foreach ($studenter as $s): ?>
-            <option value="<?php echo htmlspecialchars($s['brukernavn']); ?>">
-              <?php echo htmlspecialchars($s['brukernavn'] . ' – ' . $s['fornavn'] . ' ' . $s['etternavn']); ?>
-            </option>
-          <?php endforeach; ?>
-        </select>
-      </label>
-      <button type="submit">Slett</button>
-    </form>
+    <ul>
+      <?php foreach ($studenter as $s): ?>
+        <li>
+          <?= (int)$s['id'] ?> – <?= htmlspecialchars($s['navn']) ?>
+          (klasse <?= isset($s['klasse_id']) && $s['klasse_id'] !== null ? htmlspecialchars($klasser[$s['klasse_id']] ?? ('ID '.$s['klasse_id'])) : 'ingen' ?>)
+          – <a href="?id=<?= (int)$s['id'] ?>">Slett</a>
+        </li>
+      <?php endforeach; ?>
+    </ul>
   <?php endif; ?>
+
+  <p><a href="index.php">Tilbake til meny</a></p>
 </body>
 </html>
