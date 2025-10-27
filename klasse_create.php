@@ -1,59 +1,39 @@
 <?php
-require 'db.php';
+require 'storage.php';
 
-$melding = '';
-
+$msg = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $klassekode = trim($_POST['klassekode'] ?? '');
-    $klassenavn = trim($_POST['klassenavn'] ?? '');
-    $studiumkode = trim($_POST['studiumkode'] ?? '');
-
-    if ($klassekode === '' || $klassenavn === '' || $studiumkode === '') {
-        $melding = 'Alle felt må fylles ut.';
+    $navn = trim($_POST['navn'] ?? '');
+    if ($navn === '') {
+        $msg = 'Skriv inn et navn.';
     } else {
-        try {
-            $stmt = $pdo->prepare(
-                "INSERT INTO klasse (klassekode, klassenavn, studiumkode)
-                 VALUES (:k, :n, :s)"
-            );
-            $stmt->execute([
-                ':k' => $klassekode,
-                ':n' => $klassenavn,
-                ':s' => $studiumkode,
-            ]);
-            $melding = 'Klasse registrert!';
-        } catch (PDOException $e) {
-            if ($e->getCode() === '23000') {
-                $melding = 'Feil: Klassekode finnes allerede.';
-            } else {
-                $melding = 'Databasefeil: ' . htmlspecialchars($e->getMessage());
-            }
-        }
+        klasse_create($navn);
+        $msg = 'Klassen ble lagret.';
     }
 }
 ?>
 <!doctype html>
 <html lang="no">
-<head><meta charset="utf-8"><title>Registrer klasse</title></head>
+<head>
+  <meta charset="utf-8">
+  <title>Registrer klasse</title>
+</head>
 <body>
   <h1>Registrer klasse</h1>
-  <p><a href="index.php">Til meny</a></p>
 
-  <?php if ($melding): ?>
-    <p><strong><?php echo htmlspecialchars($melding); ?></strong></p>
+  <?php if ($msg): ?>
+    <p><?= htmlspecialchars($msg) ?></p>
   <?php endif; ?>
 
   <form method="post">
-    <label>Klassekode (maks 5 tegn):
-      <input type="text" name="klassekode" maxlength="5" required>
-    </label><br><br>
-    <label>Klassenavn:
-      <input type="text" name="klassenavn" required>
-    </label><br><br>
-    <label>Studiumkode:
-      <input type="text" name="studiumkode" required>
-    </label><br><br>
+    <label>
+      Klassenavn:
+      <input type="text" name="navn" required>
+    </label>
     <button type="submit">Lagre</button>
   </form>
+
+  <p><a href="klasse_list.php">Vis alle klasser</a></p>
+  <p><a href="index.php">Tilbake til meny</a></p>
 </body>
 </html>
