@@ -1,6 +1,4 @@
 <?php
-phpinfo();
-exit;
 echo "<!doctype html>";
 echo '<html lang="no">';
 echo "<head><meta charset='utf-8'><title>PRG120V – meny</title></head>";
