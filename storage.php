@@ -1,8 +1,13 @@
 <?php
-// Enkelt fil-lager: data/klasse.json og data/student.json
+// Bruk systemets temp-mappe (skrivbar i Dokploy)
+define('DATA_DIR', sys_get_temp_dir() . '/prg120v-data');
 
-const DATA_DIR = __DIR__ . '/data';
+// Lag mappa hvis den ikke finnes
+if (!is_dir(DATA_DIR)) {
+    mkdir(DATA_DIR, 0777, true);
+}
 
+// --------- Hjelpefunksjoner ----------
 function path_for($name) {
     return DATA_DIR . "/$name.json";
 }
