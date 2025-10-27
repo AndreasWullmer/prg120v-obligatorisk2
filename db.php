@@ -1,5 +1,5 @@
 <?php
-$host = 'mysql-12.dokploy.usn.no';
+$host = 'b-studentsql-1';
 $port = 3306;
 $db   = 'anwul4724';
 $user = 'anwul4724';
