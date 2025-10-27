@@ -2,6 +2,8 @@
 echo "<!doctype html>";
 echo '<html lang="no">';
 echo "<head><meta charset='utf-8'><title>PRG120V – meny</title></head>";
+echo "<hr><p>Deploy-markør: v1 — ".date('Y-m-d H:i:s')."</p>";
+echo '<p><a href="phpinfo.php">Åpne PHP-info</a></p>';
 echo "<body>";
 echo "<h1>PRG120V – meny</h1>";
 
