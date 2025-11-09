@@ -2,14 +2,12 @@
 require 'storage.php';
 
 $msg = '';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $kode = trim($_POST['kode'] ?? '');
     $navn = trim($_POST['navn'] ?? '');
-    if ($navn === '') {
-        $msg = 'Skriv inn et navn.';
-    } else {
-        klasse_create($navn);
-        $msg = 'Klassen ble lagret.';
-    }
+
+    [$ok, $msg] = klasse_create($kode, $navn);
 }
 ?>
 <!doctype html>
@@ -26,10 +24,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <?php endif; ?>
 
   <form method="post">
-    <label>
-      Klassenavn:
-      <input type="text" name="navn" required>
-    </label>
+    <div>
+      <label>
+        Klassekode:
+        <input type="text" name="kode" required>
+      </label>
+    </div>
+
+    <div>
+      <label>
+        Klassenavn:
+        <input type="text" name="navn" required>
+      </label>
+    </div>
+
     <button type="submit">Lagre</button>
   </form>
 
