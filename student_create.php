@@ -2,19 +2,14 @@
 require 'storage.php';
 
 $msg = '';
-$klasser = klasse_all();
+$klasser = klasse_all(); // til listeboksen
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $navn = trim($_POST['navn'] ?? '');
-    $klasse_id = $_POST['klasse_id'] ?? ''; // tom streng = ingen klasse
+    $brukernavn = trim($_POST['brukernavn'] ?? '');
+    $navn       = trim($_POST['navn'] ?? '');
+    $klasse_id  = $_POST['klasse_id'] ?? ''; // tom streng = ingen
 
-    if ($navn === '') {
-        $msg = 'Skriv inn navn.';
-    } else {
-        // lagre
-        student_create($navn, $klasse_id === '' ? null : (int)$klasse_id);
-        $msg = 'Studenten ble lagret.';
-    }
+    [$ok, $msg] = student_create($brukernavn, $navn, $klasse_id === '' ? null : (int)$klasse_id);
 }
 ?>
 <!doctype html>
@@ -32,6 +27,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   <form method="post">
     <div>
+      <label>Brukernavn:
+        <input type="text" name="brukernavn" required>
+      </label>
+    </div>
+
+    <div>
       <label>Navn:
         <input type="text" name="navn" required>
       </label>
@@ -42,7 +43,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <select name="klasse_id">
           <option value="">(ingen)</option>
           <?php foreach ($klasser as $k): ?>
-            <option value="<?= (int)$k['id'] ?>"><?= htmlspecialchars($k['navn']) ?></option>
+            <option value="<?= (int)$k['id'] ?>">
+              <?= htmlspecialchars($k['kode'] . ' – ' . $k['navn']) ?>
+            </option>
           <?php endforeach; ?>
         </select>
       </label>
